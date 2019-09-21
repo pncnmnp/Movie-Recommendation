@@ -1,6 +1,7 @@
 import pandas as pd
 from paths import PATH_MOVIES, PATH_RATINGS
 from ast import literal_eval
+import sys
 
 class Recommendation:
 	def __init__(self):
@@ -15,16 +16,33 @@ class Recommendation:
 
 		return ((vote_count/(vote_count+m))*vote_average) + ((m/(vote_count+m))*C)
 
-	def top_movies(self, percentile, limit, offset):
-		filter_count = self.md[self.md['vote_count'].notnull()]['vote_count'].astype('float')
-		filter_average = self.md[self.md['vote_average'].notnull()]['vote_average'].astype('float')
+	def imdb_stats(self, md, percentile, genre=None):
+		if genre != None:
+			genre_md = md.apply(lambda movie: pd.Series(movie['genres']), axis=1).stack().reset_index(level=1, drop=True)
+			genre_md.name = 'genre'
+			md = md.drop('genres', axis=1).join(genre_md)
+
+			genre_list = md['genre'].fillna('').unique().tolist()
+
+			if genre in genre_list:
+				md = md[md['genre'] == genre]
+			else:
+				categories = ', '.join(genre_list)
+				raise ValueError('Category not found! Here are the genres: ' + categories)
+
+		filter_count = md[md['vote_count'].notnull()]['vote_count'].astype('float')
+		filter_average = md[md['vote_average'].notnull()]['vote_average'].astype('float')
 		imdb_C = filter_average.mean()
 		imdb_m = filter_count.quantile(percentile)
 
-		top_filtered = self.md[(self.md['vote_count'] >= imdb_m) & (self.md['vote_count'].notnull()) & (self.md['vote_average'].notnull())][['title', 'id', 'vote_average', 'vote_count', 'popularity']]
+		top_filtered = md[(md['vote_count'] >= imdb_m) & (md['vote_count'].notnull()) & (md['vote_average'].notnull())][['title', 'id', 'vote_average', 'vote_count', 'popularity', 'release_date']]
 		top_filtered['vote_count'] = top_filtered['vote_count'].astype('float')
 		top_filtered['vote_average'] = top_filtered['vote_average'].astype('float')
 
+		return top_filtered, imdb_C, imdb_m
+
+	def top_movies(self, percentile, limit, offset, genre=None):
+		top_filtered, imdb_C, imdb_m = self.imdb_stats(self.md, percentile, genre)
 		top_filtered['rating'] = top_filtered.apply(self.imdb_rating, args=(imdb_C, imdb_m,), axis=1)
 
 		top_filtered = top_filtered.sort_values('rating', ascending=False)
@@ -34,5 +52,5 @@ class Recommendation:
 if __name__ == '__main__':
 	obj = Recommendation()
 	obj.filter_genres()
-	movies = obj.top_movies(percentile=0.80, limit=10, offset=0)
+	movies = obj.top_movies(percentile=0.85, limit=10, offset=0, genre=sys.argv[1])
 	print(movies)
