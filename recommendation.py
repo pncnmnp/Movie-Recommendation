@@ -1,5 +1,5 @@
 import pandas as pd
-from paths import PATH_MOVIES, PATH_RATINGS
+from variables import *
 from ast import literal_eval
 import sys
 
@@ -16,7 +16,7 @@ class Recommendation:
 
 		return ((vote_count/(vote_count+m))*vote_average) + ((m/(vote_count+m))*C)
 
-	def imdb_stats(self, md, percentile, genre=None):
+	def top_stats(self, md, percentile, genre=None):
 		if genre != None:
 			genre_md = md.apply(lambda movie: pd.Series(movie['genres']), axis=1).stack().reset_index(level=1, drop=True)
 			genre_md.name = 'genre'
@@ -28,7 +28,7 @@ class Recommendation:
 				md = md[md['genre'] == genre]
 			else:
 				categories = ', '.join(genre_list)
-				raise ValueError('Category not found! Here are the genres: ' + categories)
+				raise ValueError(CATEGORY_ERROR + categories)
 
 		filter_count = md[md['vote_count'].notnull()]['vote_count'].astype('float')
 		filter_average = md[md['vote_average'].notnull()]['vote_average'].astype('float')
@@ -41,8 +41,8 @@ class Recommendation:
 
 		return top_filtered, imdb_C, imdb_m
 
-	def top_movies(self, percentile, limit, offset, genre=None):
-		top_filtered, imdb_C, imdb_m = self.imdb_stats(self.md, percentile, genre)
+	def top_movies(self, md, percentile, limit, offset, genre=None):
+		top_filtered, imdb_C, imdb_m = self.top_stats(md, percentile, genre)
 		top_filtered['rating'] = top_filtered.apply(self.imdb_rating, args=(imdb_C, imdb_m,), axis=1)
 
 		top_filtered = top_filtered.sort_values('rating', ascending=False)
@@ -52,5 +52,9 @@ class Recommendation:
 if __name__ == '__main__':
 	obj = Recommendation()
 	obj.filter_genres()
-	movies = obj.top_movies(percentile=0.85, limit=10, offset=0, genre=sys.argv[1])
+	try:
+		genre = sys.argv[1]
+	except:
+		genre = None
+	movies = obj.top_movies(obj.md, percentile=0.85, limit=10, offset=0, genre=genre)
 	print(movies)
