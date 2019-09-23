@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import linear_kernel, cosine_similarity
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 import pandas as pd
-from variables import *
+from file_paths import *
 from numpy import argsort
 from ast import literal_eval
 import sys

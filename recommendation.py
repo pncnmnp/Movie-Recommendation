@@ -1,5 +1,5 @@
 import pandas as pd
-from variables import *
+from file_paths import *
 from ast import literal_eval
 import sys
 
