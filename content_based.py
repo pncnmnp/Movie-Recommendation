@@ -12,6 +12,8 @@ import sys
 SCAN_SIZE = 30
 ACTOR_LIMIT = 5
 CREW = ['Director']
+CREW_WT = 2
+CAST_WT = 1
 
 class ContentBased:
 	def __init__(self):
@@ -34,7 +36,7 @@ class ContentBased:
 		df['cast'] = df['cast'].apply(literal_eval).apply(lambda actors: [actor['name'].lower().replace(" ", "") for actor in actors[:ACTOR_LIMIT]] if isinstance(actors, list) else list())
 		df['crew'] = df['crew'].apply(literal_eval).apply(lambda crews: [crew['name'].lower().replace(" ", "") for crew in crews if crew['job'] in CREW] if isinstance(crews, list) else list())
 
-		df['all_keys'] = df['keywords'] + df['cast'] + df['crew'] + df['genres']
+		df['all_keys'] = df['keywords'] + df['cast']*CAST_WT + df['crew']*CREW_WT + df['genres']
 		df['all_keys'] = df['all_keys'].apply(lambda keywords: ' '.join(keywords) if isinstance(keywords, list) else str())
 
 		return df
@@ -51,20 +53,23 @@ class ContentBased:
 		cosine_sim = cosine_similarity(count_matrix, count_matrix)
 		return cosine_sim
 
+	def verify_title(self, df, title):
+		try:
+			return df.index[df['title'] == title][0]
+		except:
+			raise ValueError("No film : " + title + " found!")
+
 	def recommend(self, title, limit, critics=False, full_search=False):
 		rec = Recommendation()
 		rec.filter_genres()
+		title_index = self.verify_title(rec.md, title)
+
 		if full_search:
 			df = self.make_keywords(rec.md)
 			rec_matrix = self.countvectorize(df)
 		else:
 			df = self.make_desc(rec.md)
 			rec_matrix = self.tfidf(df)
-
-		try:
-			title_index = df.index[df['title'] == title][0]
-		except:
-			raise ValueError("No film : " + title + " found!")
 
 		rec_movie = rec_matrix[title_index]
 		ids = rec_movie.argsort()[::-1][1:SCAN_SIZE+1]
