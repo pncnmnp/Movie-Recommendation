@@ -2,15 +2,17 @@ from surprise import Reader, Dataset, SVD
 import pandas as pd
 from file_paths import *
 from content_based import ContentBased
+from numpy import array
 
 DEFAULT_ID = 700
 RATING_ATTR = ['userId', 'movieId', 'rating']
-LIMIT = 10
+LIMIT = 20
 
 class CollaborativeFiltering:
 	def __init__(self):
 		self.df_credits = pd.read_csv(PATH_CREDITS)
 		self.m_id_to_tmdb = pd.read_csv(PATH_MOVIELENS_TO_TMDB)
+		self.df_movies = pd.read_csv(PATH_MOVIES)
 
 	def get_tmdb_id(self, movieId):
 		try:
@@ -30,8 +32,9 @@ class CollaborativeFiltering:
 
 	def get_movie_title(self, m_id):
 		try:
-			return self.df_credits['title'][self.df_credits.index[self.df_credits['id'] == m_id][0]]
-		except: pass
+			vals = self.df_movies.iloc[self.df_movies.index[self.df_movies['id'] == m_id][0]][["title", "id", "vote_average", "vote_count", "popularity", "release_date"]].values
+			return vals
+		except: return None
 
 	def get_movie_ids(self):
 		return pd.read_csv(PATH_RATINGS)['movieId'].unique().tolist()
@@ -51,13 +54,22 @@ class CollaborativeFiltering:
 			rec_result[m_id] = pred.est
 
 		sorted_movies = sorted(rec_result.items(), key=lambda kv: kv[1])[::-1]
-		selected_movie_ids = [self.get_tmdb_id(movie[0]) for movie in sorted_movies[:LIMIT*2]]
-		# print(selected_movie_ids, sorted_movies[:LIMIT])
+		selected_movie_ids = [self.get_tmdb_id(movie[0]) for movie in sorted_movies[:LIMIT]]
+		# print(sorted_movies[:LIMIT])
+
+		df_pref = pd.DataFrame(columns=["title", "id", "vote_average", "vote_count", "popularity", "release_date"])
+		index = 0
 
 		for m_id in selected_movie_ids:
-			title = self.get_movie_title(m_id)
-			if title != None and title not in movies_watched:
-				print(title)
+			title_df = self.get_movie_title(m_id)
+			try:
+				if title_df[0] not in movies_watched:
+					df_pref.loc[index] = array([title_df[0], title_df[1], title_df[2], title_df[3], title_df[4], title_df[5]])
+					index += 1
+			except:
+				pass
+
+		return df_pref
 
 	def store_pref(self, pref, userId, index, rating):
 		pref[RATING_ATTR[0]].append(userId)
@@ -82,8 +94,8 @@ class CollaborativeFiltering:
 		df_rating = pd.read_csv(PATH_RATINGS)
 		df_pref_rating = df_rating.append(pd.DataFrame(pref), sort=False, ignore_index=True)
 
-		self.train_svd(df_pref_rating, userId, user_m_ids, movies_watched)
+		return self.train_svd(df_pref_rating, userId, user_m_ids, movies_watched)
 
 if __name__ == '__main__':
 	rec = CollaborativeFiltering()
-	rec.user_model({"Avatar": 5, "The Terminator": 5, "Star Trek Into Darkness": 4, "Aliens": 1, "X-Men: Days of Future Past": 4, "The Godfather": 1, "Star Wars": 4, "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb": 3})
+	print(rec.user_model({"Titanic": 4, "The Terminator": 5, "Avatar": 4.5, "The Matrix": 5, "Amélie": 1, "Singin' in the Rain": 1, "Raiders of the Lost Ark": 5, "Modern Times": 3}))
