@@ -56,15 +56,6 @@ class CollaborativeFiltering:
 		inn_id_neigh = model.get_neighbors(inn_id, k=10)
 		# print(inn_id_neigh)
 
-		# for m_id in movie_ids:
-		# 	pred = model.predict(uid=userId, iid=m_id)
-		# 	rec_result[m_id] = pred.est
-   
-
-   		# sorted_movies = sorted(rec_result.items(), key=lambda kv: kv[1])[::-1]
-		# selected_movie_ids = [self.get_tmdb_id(movie[0]) for movie in sorted_movies[:LIMIT]]
-		# print(sorted_movies[:LIMIT])
-
 		df_pref = pd.DataFrame(columns=["title", "id", "vote_average", "vote_count", "popularity", "release_date"])
 		index = 0
 
