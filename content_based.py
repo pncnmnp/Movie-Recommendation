@@ -77,7 +77,7 @@ class ContentBased:
 		if critics:
 			return rec.top_movies(df.iloc[ids], percentile=0.50, limit=limit, offset=0)
 		else:
-			return df.iloc[ids[:limit]][['title', 'id', 'vote_average', 'vote_count', 'popularity', 'release_date']]
+			return df.iloc[ids[:limit]][['original_title', 'id', 'vote_average', 'vote_count', 'popularity', 'release_date']]
 
 if __name__ == '__main__':
 	rec = ContentBased()

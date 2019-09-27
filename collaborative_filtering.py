@@ -77,7 +77,8 @@ class CollaborativeFiltering:
 		pref[RATING_ATTR[2]].append(rating)
 		return pref
 
-	def user_model(self, movies_watched):
+	def user_model(self, movies_watched, limit=LIMIT):
+		LIMIT = limit
 		userId = DEFAULT_ID
 		pref = dict()
 		user_m_ids = list()
@@ -98,4 +99,4 @@ class CollaborativeFiltering:
 
 if __name__ == '__main__':
 	rec = CollaborativeFiltering()
-	print(rec.user_model({"Titanic": 4, "The Terminator": 5, "Avatar": 4.5, "The Matrix": 5, "Amélie": 1, "Singin' in the Rain": 1, "Raiders of the Lost Ark": 5, "Modern Times": 3}))
+	print(rec.user_model({"Raiders of the Lost Ark": 5, "The Avengers": 4, "Iron Man": 4.5, "Thor": 4}))
