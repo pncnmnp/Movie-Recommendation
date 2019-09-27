@@ -1,4 +1,4 @@
-from surprise import Reader, Dataset, SVD
+from surprise import Reader, Dataset, KNNBaseline
 import pandas as pd
 from file_paths import *
 from content_based import ContentBased
@@ -41,27 +41,35 @@ class CollaborativeFiltering:
 
 	def train_svd(self, df, userId, user_m_ids, movies_watched):
 		reader = Reader(rating_scale=(1,5))
-		movie_ids = [m_id for m_id in self.get_movie_ids()]
+		movie_ids = self.get_movie_ids()
 		rec_result = dict()
 
+		sim_options = {'name': 'pearson_baseline', 'user_based': False}
+
 		data = Dataset.load_from_df(df[RATING_ATTR], reader)
+		model = KNNBaseline(sim_options=sim_options)
 		trainset = data.build_full_trainset()
-		model = SVD()
 		model.fit(trainset)
 
-		for m_id in movie_ids:
-			pred = model.predict(uid=userId, iid=m_id)
-			rec_result[m_id] = pred.est
+		inn_id = model.trainset.to_inner_iid(user_m_ids[0])
+		# print(self.get_movie_title(self.get_tmdb_id(user_m_ids[0])))
+		inn_id_neigh = model.get_neighbors(inn_id, k=10)
+		# print(inn_id_neigh)
 
-		sorted_movies = sorted(rec_result.items(), key=lambda kv: kv[1])[::-1]
-		selected_movie_ids = [self.get_tmdb_id(movie[0]) for movie in sorted_movies[:LIMIT]]
+		# for m_id in movie_ids:
+		# 	pred = model.predict(uid=userId, iid=m_id)
+		# 	rec_result[m_id] = pred.est
+   
+
+   		# sorted_movies = sorted(rec_result.items(), key=lambda kv: kv[1])[::-1]
+		# selected_movie_ids = [self.get_tmdb_id(movie[0]) for movie in sorted_movies[:LIMIT]]
 		# print(sorted_movies[:LIMIT])
 
 		df_pref = pd.DataFrame(columns=["title", "id", "vote_average", "vote_count", "popularity", "release_date"])
 		index = 0
 
-		for m_id in selected_movie_ids:
-			title_df = self.get_movie_title(m_id)
+		for m_id in inn_id_neigh:
+			title_df = self.get_movie_title(self.get_tmdb_id(model.trainset.to_raw_iid(m_id)))
 			try:
 				if title_df[0] not in movies_watched:
 					df_pref.loc[index] = array([title_df[0], title_df[1], title_df[2], title_df[3], title_df[4], title_df[5]])

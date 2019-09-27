@@ -21,14 +21,14 @@ class Hybrid:
 			if movie["original_title"] == title:
 				return movie
 
-	def get_recommendation(self, movie, review, critics=False, full_search=False):
+	def get_recommendation(self, movie, review, critics=False, full_search=False):																		
 		rec_content_obj, rec_coll_obj = ContentBased(), CollaborativeFiltering()
 		rec_content = rec_content_obj.recommend(movie, self.LIMIT, critics, full_search)
 		rec_content = self.convert_literal_eval(rec_content.to_json(orient='records', lines=True))
 		print("CONTENT")
 		# pprint.pprint(rec_content)
 
-		rec_coll_obj.LIMIT = 10000
+		rec_coll_obj.LIMIT = 1000
 		rec_coll = rec_coll_obj.user_model({movie: review})
 		rec_coll = self.convert_literal_eval(rec_coll.to_json(orient='records', lines=True))
 		print("COLAB")
@@ -54,4 +54,4 @@ class Hybrid:
 
 if __name__ == '__main__':
 	obj = Hybrid()
-	print(obj.get_recommendation('The Avengers', 5, False, True))
+	print(obj.get_recommendation('The Dark Knight', 5, False, True))
