@@ -10,4 +10,5 @@ PATH_PICKLE_KEYWORDS = "./movies_meta/keywords.pkl"
 PATH_PICKLE_DESC = "./movies_meta/desc.pkl"
 
 # errors
-CATEGORY_ERROR = 'Category not found! Here are the genres: '
+CATEGORY_ERROR = "Category not found! Here are the genres: "
+
