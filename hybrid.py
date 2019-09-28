@@ -2,6 +2,7 @@ from content_based import ContentBased
 from collaborative_filtering import CollaborativeFiltering
 from collections import Counter
 import pandas as pd
+import sys
 from numpy import array
 from ast import literal_eval
 
@@ -111,5 +112,5 @@ class Hybrid:
 
 if __name__ == "__main__":
 	obj = Hybrid()
-	print(obj.get_recommendation("The Bourne Identity", 5, True, True, True))
+	print(obj.get_recommendation(sys.argv[1], 5, True, True, True))
 
