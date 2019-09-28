@@ -20,7 +20,7 @@ class Hybrid:
 			if movie["original_title"] == title:
 				return movie
 
-	def get_recommendation(self, movie, review, critics=False, full_search=False):
+	def get_recommendation(self, movie, review, critics=False, full_search=False, use_pickle=True):
 		"""
             For hybrid recommendations: LIMIT (instance var) determines no. of movies outputted
             Param: movie - title of the movie (as mentioned in DB)
@@ -40,7 +40,7 @@ class Hybrid:
             2x of them will be content based and 1x collaborative based. 
 		"""
 		rec_content_obj, rec_coll_obj = ContentBased(), CollaborativeFiltering()
-		rec_content = rec_content_obj.recommend(movie, self.LIMIT, critics, full_search)
+		rec_content = rec_content_obj.recommend(movie, self.LIMIT, critics, full_search, use_pickle)
 		rec_content = self.convert_literal_eval(rec_content.to_json(orient='records', lines=True))
 		print("Content Filtering completed.....")
 
@@ -90,4 +90,4 @@ class Hybrid:
 
 if __name__ == '__main__':
 	obj = Hybrid()
-	print(obj.get_recommendation('The Bourne Identity', 5, True, True))
+	print(obj.get_recommendation('The Bourne Identity', 5, True, True, True))

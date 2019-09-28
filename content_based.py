@@ -7,6 +7,7 @@ import pandas as pd
 from file_paths import *
 from numpy import argsort
 from ast import literal_eval
+from os.path import isfile
 import sys
 
 SCAN_SIZE = 30
@@ -59,16 +60,24 @@ class ContentBased:
 		except:
 			raise ValueError("No film : " + title + " found!")
 
-	def recommend(self, title, limit, critics=False, full_search=False):
+	def recommend(self, title, limit, critics=False, full_search=False, use_pickle=True):
 		rec = Recommendation()
 		rec.filter_genres()
 		title_index = self.verify_title(rec.md, title)
 
 		if full_search:
-			df = self.make_keywords(rec.md)
+			if isfile(PATH_PICKLE_KEYWORDS) and use_pickle:
+				df = pd.read_pickle(PATH_PICKLE_KEYWORDS)
+			else:
+				df = self.make_keywords(rec.md)
+				df.to_pickle(PATH_PICKLE_KEYWORDS)
 			rec_matrix = self.countvectorize(df)
 		else:
-			df = self.make_desc(rec.md)
+			if isfile(PATH_PICKLE_DESC) and use_pickle:
+				df = pd.read_pickle(PATH_PICKLE_DESC)
+			else:
+				df = self.make_desc(rec.md)
+				df.to_pickle(PATH_PICKLE_DESC)
 			rec_matrix = self.tfidf(df)
 
 		rec_movie = rec_matrix[title_index]
@@ -81,4 +90,4 @@ class ContentBased:
 
 if __name__ == '__main__':
 	rec = ContentBased()
-	print(rec.recommend(sys.argv[1], 10, critics=False, full_search=True))
+	print(rec.recommend(sys.argv[1], 10, critics=False, full_search=True, use_pickle=True))
