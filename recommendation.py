@@ -3,12 +3,14 @@ from file_paths import *
 from ast import literal_eval
 import sys
 
-
 class Recommendation:
 	def __init__(self):
 		self.md = pd.read_csv(PATH_MOVIES)
 
 	def filter_genres(self):
+		"""
+            Maps each genre to each movie title 
+		"""
 		self.md["genres"] = (
 			self.md["genres"]
 			.apply(literal_eval)
@@ -20,14 +22,38 @@ class Recommendation:
 		)
 
 	def imdb_rating(self, film, C, m):
+		"""
+            param: film - DataFrame of the particular film 
+                          (should contain vote_count and vote_average)
+                   C - mean of the average ratings
+                   m - minimum votes required to be listed
+
+            return: rating of the film (float)
+		"""
 		vote_count = film["vote_count"]
 		vote_average = film["vote_average"]
 
-		return ((vote_count / (vote_count + m)) * vote_average) + (
-			(m / (vote_count + m)) * C
-		)
+		return ((vote_count / (vote_count + m)) * vote_average) + ((m / (vote_count + m)) * C)
 
 	def top_stats(self, md, percentile, genre=None):
+		"""
+            param: md - movie pandas DataFrame
+                   percentile - cutoff percentile (0.0 to 1.0)
+                   genre - genre based recommendation (default = None)
+                   (Genres in TMDB dataset are: Action, Adventure, Fantasy, 
+                   Science Fiction, Crime, Drama, Thriller, Animation, Family, 
+                   Western, Comedy, Romance, Horror, Mystery, History, War, 
+                   Music, Documentary, Foreign, TV Movie)
+
+                   If genre is set to None, overall ranking will be returned.
+
+            return: top_filtered - pandas DataFrame filtered by percentile threshold
+                                   and genres. The attributes of the DataFrame are -
+                                   original_title, id, vote_average, vote_count, 
+                                   popularity, release_date.
+                    imdb_C - mean value of all the vote_averages
+                    imdb_m - minimum votes required to be listed 
+		"""
 		if genre != None:
 			genre_md = (
 				md.apply(lambda movie: pd.Series(movie["genres"]), axis=1)
@@ -46,9 +72,7 @@ class Recommendation:
 				raise ValueError(CATEGORY_ERROR + categories)
 
 		filter_count = md[md["vote_count"].notnull()]["vote_count"].astype("float")
-		filter_average = md[md["vote_average"].notnull()]["vote_average"].astype(
-			"float"
-		)
+		filter_average = md[md["vote_average"].notnull()]["vote_average"].astype("float")
 		imdb_C = filter_average.mean()
 		imdb_m = filter_count.quantile(percentile)
 
@@ -72,6 +96,22 @@ class Recommendation:
 		return top_filtered, imdb_C, imdb_m
 
 	def top_movies(self, md, percentile, limit, offset, genre=None):
+		"""
+            param: md - movie pandas DataFrame
+                   percentile - cutoff percentile (0.0 to 1.0)
+                   limit - no. of movies to display
+                   offset - base value
+                   genre - genre based recommendation (default = None)
+                   (Genres in TMDB dataset are: Action, Adventure, Fantasy, 
+                   Science Fiction, Crime, Drama, Thriller, Animation, Family, 
+                   Western, Comedy, Romance, Horror, Mystery, History, War, 
+                   Music, Documentary, Foreign, TV Movie)
+
+                   If genre is set to None, overall ranking will be returned.
+
+            return: pandas DataFrame of top movies calculated using the imdb
+                    formula.
+		"""
 		top_filtered, imdb_C, imdb_m = self.top_stats(md, percentile, genre)
 		top_filtered["rating"] = top_filtered.apply(
 			self.imdb_rating, args=(imdb_C, imdb_m), axis=1
@@ -90,4 +130,3 @@ if __name__ == "__main__":
 		genre = None
 	movies = obj.top_movies(obj.md, percentile=0.85, limit=10, offset=0, genre=genre)
 	print(movies)
-

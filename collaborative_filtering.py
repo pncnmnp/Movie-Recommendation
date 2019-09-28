@@ -8,7 +8,6 @@ DEFAULT_ID = 700
 RATING_ATTR = ["userId", "movieId", "rating"]
 LIMIT = 20
 
-
 class CollaborativeFiltering:
 	def __init__(self):
 		self.df_credits = pd.read_csv(PATH_CREDITS)
@@ -16,6 +15,11 @@ class CollaborativeFiltering:
 		self.df_movies = pd.read_csv(PATH_MOVIES)
 
 	def get_tmdb_id(self, movieId):
+		"""
+            param: movieId - movieId of the movie (as seen in MovieLens dataset)
+
+            return: tmdbId corresponding to the movieID
+		"""
 		try:
 			return self.m_id_to_tmdb["tmdbId"][
 				self.m_id_to_tmdb.index[self.m_id_to_tmdb["movieId"] == movieId][0]
@@ -24,6 +28,11 @@ class CollaborativeFiltering:
 			pass
 
 	def get_m_id(self, tmdbId):
+		"""
+            param: tmdbId - tmdbId of the movie (as seen in TMDB dataset)
+
+            return: movieId corresponding to the tmdbId
+		"""
 		try:
 			return self.m_id_to_tmdb["movieId"][
 				self.m_id_to_tmdb.index[self.m_id_to_tmdb["tmdbId"] == tmdbId][0]
@@ -32,6 +41,12 @@ class CollaborativeFiltering:
 			pass
 
 	def get_title_index(self, title):
+		"""
+            param: title - movie title (as in TMDB dataset)
+
+
+            return: if title found - returns index value of the title from df_credits
+		"""
 		try:
 			return self.df_credits["id"][
 				self.df_credits.index[self.df_credits["title"] == title][0]
@@ -40,6 +55,11 @@ class CollaborativeFiltering:
 			raise ValueError("No film : " + title + " found!")
 
 	def get_movie_title(self, m_id):
+		"""
+            param: m_id - index value (id) (corresponding to df_movies)
+
+            return: movie title corresponding to m_id (as in df_movies)
+		"""
 		try:
 			vals = self.df_movies.iloc[
 				self.df_movies.index[self.df_movies["id"] == m_id][0]
@@ -58,9 +78,28 @@ class CollaborativeFiltering:
 			return None
 
 	def get_movie_ids(self):
+		"""
+            param: None
+
+            return: List of all the unique movieIds (from PATH_RATINGS path)
+		"""
 		return pd.read_csv(PATH_RATINGS)["movieId"].unique().tolist()
 
-	def train_svd(self, df, userId, user_m_ids, movies_watched):
+	def train_knn(self, df, userId, user_m_ids, movies_watched):
+		"""
+            param: df - movies pandas DataFrame
+                   userId - user ID to predict movies with
+                   user_m_ids - List of movieIDs of movies to be recommended upon
+                                (as seen in TMDB dataset)
+                   movies_watched - List of movie titles watched 
+                                    (as seen in TMDB dataset)
+
+            return: pandas DataFrame of the recommended movies with attributes - 
+                    title, id, vote_average, vote_count, popularity, release date
+
+            Collaborative filtering is done using KNN-Baseline and prediction is 
+            done using pearson_baseline. The technique used is item-item based.
+		"""
 		reader = Reader(rating_scale=(1, 5))
 		movie_ids = self.get_movie_ids()
 		rec_result = dict()
@@ -112,12 +151,28 @@ class CollaborativeFiltering:
 		return df_pref
 
 	def store_pref(self, pref, userId, index, rating):
+		"""
+            param: pref - dict with keys - userId, movieId, rating
+                   userId - userId to be inserted (int)
+                   index - movieId to be inserted (int)
+                   rating - rating on a scale of (1-5)
+
+            return: pref with userId, index and rating values appended
+		"""
 		pref[RATING_ATTR[0]].append(userId)
 		pref[RATING_ATTR[1]].append(index)
 		pref[RATING_ATTR[2]].append(rating)
 		return pref
 
 	def user_model(self, movies_watched, limit=LIMIT):
+		"""
+            param: movies_watched - dict of form -
+                                    {'movieName1': rating1,
+                                     'movieName2': rating2,
+                                     .....}
+                   limit - no. of movies to display
+                           (default = LIMIT)
+		"""
 		LIMIT = limit
 		userId = DEFAULT_ID
 		pref = dict()
@@ -137,7 +192,7 @@ class CollaborativeFiltering:
 			pd.DataFrame(pref), sort=False, ignore_index=True
 		)
 
-		return self.train_svd(df_pref_rating, userId, user_m_ids, movies_watched)
+		return self.train_knn(df_pref_rating, userId, user_m_ids, movies_watched)
 
 if __name__ == "__main__":
 	rec = CollaborativeFiltering()
@@ -151,4 +206,3 @@ if __name__ == "__main__":
 			}
 		)
 	)
-

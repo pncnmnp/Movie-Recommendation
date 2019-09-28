@@ -6,15 +6,29 @@ import sys
 from numpy import array
 from ast import literal_eval
 
-
 class Hybrid:
 	def __init__(self):
 		self.LIMIT = 20
 
 	def convert_literal_eval(self, json_str):
+		"""
+            param: json_str - pandas DataFrame converted to JSON format
+
+            return: Literal Eval of the JSON string in List format
+		"""
 		return literal_eval("[" + json_str.replace("\n", ",") + "]")
 
 	def get_movie_json(self, title, rec_coll, rec_content):
+		"""
+            param: title - movie title to search (as mentioned in TMDB dataset)
+                   rec_coll - movies recommended by Collaborative Filtering
+                   rec_content - movies recommended by ContentBased          
+                  NOTE: Parse both the results (rec_coll and rec_content) 
+                  in convert_literal_eval before passing the parameters.
+                  See get_recommendation() for example.
+
+            return: movie data in JSON format
+		"""
 		for movie in rec_coll:
 			if movie["title"] == title:
 				return movie
@@ -26,22 +40,22 @@ class Hybrid:
 		self, movie, review, critics=False, full_search=False, use_pickle=True
 	):
 		"""
-			For hybrid recommendations: LIMIT (instance var) determines no. of movies outputted
-			Param: movie - title of the movie (as mentioned in DB)
-				   review - rating of the movie on the scale of 1-5
-				   critics - (True or False type) Critically acclaimed recommendations
-				   full_search - True: Recommendations generated using keywords, cast, crew and genre
-								 False: Recommendations generated on basis of tagline and overview
+            For hybrid recommendations: LIMIT (instance var) determines no. of movies outputted
+            param: movie - title of the movie (as mentioned in DB)
+                   review - rating of the movie on the scale of 1-5
+                   critics - (True or False type) Critically acclaimed recommendations
+                   full_search - True: Recommendations generated using keywords, cast, crew and genre
+                                 False: Recommendations generated on basis of tagline and overview
 
-			Return: pandas DataFrame object with attributes -
-					title, id, vote_average, vote_count, popularity, release_date
+            return: pandas DataFrame object with attributes -
+                    title, id, vote_average, vote_count, popularity, release_date
 
-			Recommendations which have frequency greater than 1 in both 
-			collaborative and content based filtering results are chosen 
-			as result. If the total result found are less than limit than 
-			the difference is divided into a ratio of 2:1, for content based 
-			and collaborative results. i.e Out of the remaining results, 
-			2x of them will be content based and 1x collaborative based. 
+            Recommendations which have frequency greater than 1 in both 
+            collaborative and content based filtering results are chosen 
+            as result. If the total result found are less than limit than 
+            the difference is divided into a ratio of 2:1, for content based 
+            and collaborative results. i.e Out of the remaining results, 
+            2x of them will be content based and 1x collaborative based. 
 		"""
 		rec_content_obj, rec_coll_obj = ContentBased(), CollaborativeFiltering()
 		rec_content = rec_content_obj.recommend(
@@ -113,4 +127,3 @@ class Hybrid:
 if __name__ == "__main__":
 	obj = Hybrid()
 	print(obj.get_recommendation(sys.argv[1], 5, True, True, True))
-

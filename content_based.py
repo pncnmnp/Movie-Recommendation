@@ -16,12 +16,16 @@ CREW = ["Director"]
 CREW_WT = 2
 CAST_WT = 1
 
-
 class ContentBased:
 	def __init__(self):
 		self.md_credits = pd.read_csv(PATH_CREDITS)
 
 	def make_desc(self, df):
+		"""
+            param: df - movies pandas DataFrame 
+
+            return: pandas DataFrame with overview and tagline combined
+		"""
 		df["tagline"] = df["tagline"].fillna("")
 		df["overview"] = df["overview"] + df["tagline"]
 		df["overview"] = df["overview"].fillna("")
@@ -30,7 +34,10 @@ class ContentBased:
 
 	def make_keywords(self, df):
 		"""
-		Based on crew and cast members, movie-keywords, genres
+            param: df - movies pandas DataFrame
+
+            return: pandas DataFrame with attribute 'all_keys', 
+                    which combines crew andcast members, movie-keywords, genres.
 		"""
 		stemmer = SnowballStemmer("english")
 		df["keywords"] = (
@@ -48,6 +55,7 @@ class ContentBased:
 			.apply(literal_eval)
 			.apply(
 				lambda actors: [
+					# To count actor name as one word like 'tomcruise'
 					actor["name"].lower().replace(" ", "")
 					for actor in actors[:ACTOR_LIMIT]
 				]
@@ -60,6 +68,7 @@ class ContentBased:
 			.apply(literal_eval)
 			.apply(
 				lambda crews: [
+					# To count director name as one word like "stanleykubrick"
 					crew["name"].lower().replace(" ", "")
 					for crew in crews
 					if crew["job"] in CREW
@@ -79,6 +88,11 @@ class ContentBased:
 		return df
 
 	def tfidf(self, df):
+		"""
+            param: df - movies pandas DataFrame
+
+            return: cosine similarity matrix based on overview and description
+		"""
 		tfidf = TfidfVectorizer(
 			analyzer="word", stop_words=stopwords.words("english"), ngram_range=(1, 2)
 		)
@@ -87,6 +101,11 @@ class ContentBased:
 		return cosine_sim
 
 	def countvectorize(self, df):
+		"""
+            param: df - movies pandas DataFrame
+
+            return: cosine similarity matrix based on crew, cast, keywords and genre
+		"""
 		count = CountVectorizer(
 			analyzer="word", ngram_range=(1, 2), stop_words=stopwords.words("english")
 		)
@@ -95,6 +114,13 @@ class ContentBased:
 		return cosine_sim
 
 	def verify_title(self, df, title):
+		"""
+            param: df - movies pandas DataFrame
+                   title - movie title (as in TMDB dataset)
+
+            return: if title found - returns index value of the title from df
+                    else - raises ValueError
+		"""
 		try:
 			return df.index[df["title"] == title][0]
 		except:
@@ -103,6 +129,21 @@ class ContentBased:
 	def recommend(
 		self, title, limit, critics=False, full_search=False, use_pickle=True
 	):
+		"""
+            param: title - movie title (as in TMDB dataset)
+                   limit - no. of movies to display
+                   critics - True - will display critically acclaimed movies
+                             False - will not sort movies on basis of their imdb rankings
+                             (DEFAULT - False)
+                   full_search - True - will search using cast, crew, keywords 
+                                        and genre as metadata
+                                 False - will search using overview and tagline 
+                                         as metadata
+                                 (DEFAULT - False)
+                   use_pickle - True - will use pickled results
+                                False - will compute the results from scratch
+                                (DEFAULT - True)
+		"""
 		rec = Recommendation()
 		rec.filter_genres()
 		title_index = self.verify_title(rec.md, title)
@@ -144,4 +185,3 @@ if __name__ == "__main__":
 	print(
 		rec.recommend(sys.argv[1], 10, critics=False, full_search=True, use_pickle=True)
 	)
-
