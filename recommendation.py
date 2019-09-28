@@ -35,7 +35,7 @@ class Recommendation:
 		imdb_C = filter_average.mean()
 		imdb_m = filter_count.quantile(percentile)
 
-		top_filtered = md[(md['vote_count'] >= imdb_m) & (md['vote_count'].notnull()) & (md['vote_average'].notnull())][['title', 'id', 'vote_average', 'vote_count', 'popularity', 'release_date']]
+		top_filtered = md[(md['vote_count'] >= imdb_m) & (md['vote_count'].notnull()) & (md['vote_average'].notnull())][['original_title', 'id', 'vote_average', 'vote_count', 'popularity', 'release_date']]
 		top_filtered['vote_count'] = top_filtered['vote_count'].astype('float')
 		top_filtered['vote_average'] = top_filtered['vote_average'].astype('float')
 

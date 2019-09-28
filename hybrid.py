@@ -74,7 +74,7 @@ class Hybrid:
 			for rec in [rec_content, rec_coll]:
 				for movie in rec:
 					if movie[rec_title_name[curr_rec]] not in movie_df["title"].tolist():
-						movie_df.loc[index] = array(list(movie.values()))
+						movie_df.loc[index] = array(list(movie.values())[:6])
 						index += 1
 					if start_index + rec_content_cutoff == index and rec == rec_content:
 						curr_rec = 1
@@ -90,4 +90,4 @@ class Hybrid:
 
 if __name__ == '__main__':
 	obj = Hybrid()
-	print(obj.get_recommendation('Sherlock Holmes: A Game of Shadows', 5, False, True))
+	print(obj.get_recommendation('The Bourne Identity', 5, True, True))
