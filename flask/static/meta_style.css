@@ -3,6 +3,10 @@
 	margin: auto;
 }
 
+.meta-info {
+	text-align: center;
+}
+
 img {
 	display: block;
 	margin: 0 auto;
@@ -16,10 +20,12 @@ img {
 
 .title {
 	font-weight: bold;
+	font-size: 22px;
 }
 
 .tagline {
 	font-style: italic;
+	padding-bottom: 20px;
 }
 
 .meta-attr {
@@ -33,4 +39,9 @@ img {
 .overview {
 	text-align: center;
 	background-color: #f3f3f3;
+}
+
+.rec-movies {
+	padding-top: 20px;
+	padding-bottom: 20px;
 }

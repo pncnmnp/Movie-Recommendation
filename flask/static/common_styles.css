@@ -1,12 +1,21 @@
+@font-face {
+	font-family: 'open_sansregular';
+	src: url('./fonts/opensans-regular-webfont.woff2') format('woff2'),
+		 url('./fonts/opensans-regular-webfont.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
 html, body {
 	height: 100%;
+	font-family: 'open_sansregular', 'Helvetica', sans-serif;
 }
 
 .row {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-
 }
 
 .row > img {

@@ -50,6 +50,11 @@ def movie_meta():
 		m_id = request.args["id"]
 		df_meta = get_meta(title)
 		poster_path = get_poster_paths([int(m_id)], [title])[title]
+
+		rec = ContentBased()
+		df_rec = rec.recommend(title, 5, full_search=True, keywords_and_desc=False, critics=False)
+		rec_poster_paths = get_poster_paths(df_rec["id"].tolist(), df_rec["original_title"].tolist(), small=True)
+
 		return render_template('meta.html',
 								title=df_meta[0]["original_title"],
 								genres=df_meta[0]["genres"],
@@ -63,6 +68,17 @@ def movie_meta():
 								vote_count=df_meta[0]["vote_count"],
 								cast=df_meta[1],
 								director=df_meta[2],
-								poster_path=poster_path)
+								poster_path=poster_path,
+								rec_posters=rec_poster_paths,
+								rec_titles=df_rec["original_title"].tolist(),
+								rec_m_ids=df_rec["id"].tolist())
 	else:
 		abort(404)
+
+@app.after_request
+def apply_caching(response):
+	response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+	response.headers['X-Content-Type-Options'] = 'nosniff'
+	response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+	response.headers['X-XSS-Protection'] = '1; mode=block'
+	return response

@@ -16,13 +16,13 @@
 			<div class="row">
 			{% for title in titles %}
 				<div class="container">
-					<img class="posters" src="{{ images[title] }}" alt="{{ title }}">
+					<img class="posters" src="{{ images[title] }}" alt="{{ title }}" width="185px" height="283px">
 					<div class="overlay">
 						<div class="overlay-text">
 							<a class="rec-img" href="/movie?title={{ title }}&id={{ m_id[loop.index-1] }}">
-								{{ title }}
+								<b>{{ title }}</b>
 								<br>
-								{{ votes[loop.index-1] }}
+								<pre>Rating: {{ votes[loop.index-1] }}</pre>
 							</a>
 						</div>
 					</div>

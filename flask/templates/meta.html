@@ -7,6 +7,7 @@
 		<meta name="description" content="A movie recommender system">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='meta_style.css') }}" />
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='common_styles.css') }}" />
 		<title>Movie Database</title>
 	</head>
 
@@ -17,19 +18,27 @@
 				<div class="title">{{ title }}</div>
 				<div class="tagline">{{ tagline }}</div>
 				<div class="director"><span class="meta-attr">Director: </span>{{ director[0] }}</div>
-				<div class="genres">
-					<span class="meta-attr">Genres: </span>{{ genres|join(', ') }}
-				</div>
 				<div class="release_date"><span class="meta-attr">Release-date: </span>{{ release }}</div>
 				<div class="runtime"><span class="meta-attr">Runtime: </span>{{ runtime }} minutes</div>
 				<div class="vote_average"><span class="meta-attr">Average Vote: </span>{{ vote_average }}</div>
 				<div class="vote_count"><span class="meta-attr">Total Votes: </span>{{ vote_count }}</div>
+				<div class="genres">
+					<span class="meta-attr">Genres: </span>{{ genres|join(', ') }}
+				</div>
 				<div class="production"><span class="meta-attr">Production Company:</span> {{ production |join(', ')}} </div>
 				<div class="actors">
 					<span class="meta-attr">Actors: </span>{{ cast|join(', ') }}
 				</div>
 				<div class="overview">{{ overview }}</div>
+				<div class="rec-movies">
+					<span class="meta-attr">Similar Movies: </span>
+					<div class="row">
+						{% for title in rec_titles %}
+							<a href="/movie?title={{ title }}&id={{ rec_m_ids[loop.index-1] }}"><img class="posters" src="{{ rec_posters[title] }}" alt="{{ title }}" width="92px" height="138px"></a>
+						{% endfor %}
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>
-</html>	
+</html>
