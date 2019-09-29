@@ -11,15 +11,18 @@
 	</head>
 
 	<body>
-		<h1>Movie Database</h1>
-		<div class="search-movie-homepage">
-			<form action="" method="get">
-				<label class="search-label">Enter a movie
-					<br>
-					<input type="text" id="search" name="recommend">
-				</label>
-				<button class="search-button">Recommend</button>				
-			</form>
-		</div>
+		<div class="homepage">
+			<img src="{{ url_for('static', filename='images/logo-homepage.png') }}" class="homepage-logo">
+			<div class="search-movie-homepage">
+				<form action="" method="get">
+					<label class="search-label">
+						Enter movie name to get recommendations!
+						<br>
+						<input type="text" id="search" name="recommend">
+					</label>
+					<button class="search-button">Recommend</button>				
+				</form>
+			</div>
+		</div>	
 	</body>
 </html>

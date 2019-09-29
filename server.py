@@ -1,18 +1,68 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, abort
 import pandas as pd
 from get_posters import get_poster_paths
 from content_based import ContentBased
-app = Flask(__name__, template_folder="./flask/templates/")
+from file_paths import *
+from recommendation import Recommendation
+from ast import literal_eval
 
-DEFAULT_LIMIT = 10
+app = Flask(__name__, template_folder="./flask/templates/", static_folder="./flask/static/")
+
+DEFAULT_LIMIT = 14
+
+def get_meta(title):
+	rec = Recommendation()
+	rec.filter_genres()
+	rec.filter_productions()
+	df_movies = rec.md
+	df_credits = pd.read_csv(PATH_CREDITS)
+	attributes = ["id", "original_title", "genres", "homepage", 
+					"overview", "release_date", "production_companies", 
+					"runtime", "tagline", "vote_average", "vote_count"]
+
+	df_title = df_movies.iloc[df_movies.index[
+								df_movies["original_title"] == title][0]][attributes]
+	df_crew = df_credits.iloc[df_credits.index[df_credits["title"] == title][0]][["cast", "crew"]]
+	cast = [cast["name"] for cast in literal_eval(df_crew["cast"])[0:5]]
+	crew = [crew["name"] for crew in literal_eval(df_crew["crew"]) if crew["job"] in ["Director"]]
+
+	return df_title, cast, crew
 
 @app.route('/', methods=["GET"])
 def home():
 	if "recommend" in request.args:
 		title = request.args["recommend"]
 		rec = ContentBased()
-		df = rec.recommend(title, DEFAULT_LIMIT, full_search=True, keywords_and_desc=True)
+		df = rec.recommend(title, DEFAULT_LIMIT, full_search=True, keywords_and_desc=False, critics=False)
 		poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
-		return render_template('recommendations.html', titles=df["original_title"].tolist(), images=poster_paths)
+		return render_template('recommendations.html', 
+								titles=df["original_title"].tolist(), 
+								images=poster_paths, 
+								votes=df["vote_average"].tolist(), 
+								m_id=df["id"].tolist())
 	else:
 		return render_template('homepage.html')
+
+@app.route('/movie', methods=["GET"])
+def movie_meta():
+	if "title" in request.args:
+		title = request.args["title"]
+		m_id = request.args["id"]
+		df_meta = get_meta(title)
+		poster_path = get_poster_paths([int(m_id)], [title])[title]
+		return render_template('meta.html',
+								title=df_meta[0]["original_title"],
+								genres=df_meta[0]["genres"],
+								homepage=df_meta[0]["homepage"],
+								overview=df_meta[0]["overview"],
+								release=df_meta[0]["release_date"],
+								production=df_meta[0]["production_companies"],
+								runtime=df_meta[0]["runtime"],
+								tagline=df_meta[0]["tagline"],
+								vote_average=df_meta[0]["vote_average"],
+								vote_count=df_meta[0]["vote_count"],
+								cast=df_meta[1],
+								director=df_meta[2],
+								poster_path=poster_path)
+	else:
+		abort(404)

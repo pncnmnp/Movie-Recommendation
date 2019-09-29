@@ -11,15 +11,24 @@
 	</head>
 
 	<body>
-		<h1>Movie Database</h1>
+		<img src="{{ url_for('static', filename='images/logo-homepage.png') }}" class="homepage-logo">
 		<div class="recommendations">
+			<div class="row">
 			{% for title in titles %}
-				<p>
-					<img src="{{ images[title] }}">
-					<br>
-					{{ title }}
-				</p>
+				<div class="container">
+					<img class="posters" src="{{ images[title] }}" alt="{{ title }}">
+					<div class="overlay">
+						<div class="overlay-text">
+							<a class="rec-img" href="/movie?title={{ title }}&id={{ m_id[loop.index-1] }}">
+								{{ title }}
+								<br>
+								{{ votes[loop.index-1] }}
+							</a>
+						</div>
+					</div>
+				</div>
 			{% endfor %}
+			</div>
 		</div>
 	</body>
 </html>

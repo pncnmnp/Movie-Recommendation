@@ -1,0 +1,36 @@
+.movie-info {
+	max-width: 500px;
+	margin: auto;
+}
+
+img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+	border-radius: 10px;
+}
+
+.title, .tagline {
+	text-align: center;
+}
+
+.title {
+	font-weight: bold;
+}
+
+.tagline {
+	font-style: italic;
+}
+
+.meta-attr {
+	font-weight: bold;
+}
+
+.actors {
+	padding-bottom: 20px;
+}
+
+.overview {
+	text-align: center;
+	background-color: #f3f3f3;
+}

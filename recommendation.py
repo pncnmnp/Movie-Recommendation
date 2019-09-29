@@ -7,6 +7,17 @@ class Recommendation:
 	def __init__(self):
 		self.md = pd.read_csv(PATH_MOVIES)
 
+	def filter_productions(self):
+		self.md["production_companies"] = (
+			self.md["production_companies"]
+			.apply(literal_eval)
+			.apply(
+				lambda companies: [company["name"] for company in companies]
+				if isinstance(companies, list)
+				else list()
+			)
+		)	
+
 	def filter_genres(self):
 		"""
             Maps each genre to each movie title 
@@ -17,7 +28,7 @@ class Recommendation:
 			.apply(
 				lambda genres: [genre["name"] for genre in genres]
 				if isinstance(genres, list)
-				else []
+				else list()
 			)
 		)
 

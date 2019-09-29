@@ -198,5 +198,5 @@ class ContentBased:
 if __name__ == "__main__":
 	rec = ContentBased()
 	print(
-		rec.recommend(sys.argv[1], 10, critics=False, full_search=True, use_pickle=True, keywords_and_desc=False)
+		rec.recommend(sys.argv[1], 14, critics=False, full_search=True, use_pickle=False, keywords_and_desc=False)
 	)

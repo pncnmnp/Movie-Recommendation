@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="author" content="parth_parikh">
+		<meta name="description" content="A movie recommender system">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='meta_style.css') }}" />
+		<title>Movie Database</title>
+	</head>
+
+	<body>
+		<div class="movie-info">
+			<img src="{{ poster_path }}" alt="{{ title }}">
+			<div class="meta-info">
+				<div class="title">{{ title }}</div>
+				<div class="tagline">{{ tagline }}</div>
+				<div class="director"><span class="meta-attr">Director: </span>{{ director[0] }}</div>
+				<div class="genres">
+					<span class="meta-attr">Genres: </span>{{ genres|join(', ') }}
+				</div>
+				<div class="release_date"><span class="meta-attr">Release-date: </span>{{ release }}</div>
+				<div class="runtime"><span class="meta-attr">Runtime: </span>{{ runtime }} minutes</div>
+				<div class="vote_average"><span class="meta-attr">Average Vote: </span>{{ vote_average }}</div>
+				<div class="vote_count"><span class="meta-attr">Total Votes: </span>{{ vote_count }}</div>
+				<div class="production"><span class="meta-attr">Production Company:</span> {{ production |join(', ')}} </div>
+				<div class="actors">
+					<span class="meta-attr">Actors: </span>{{ cast|join(', ') }}
+				</div>
+				<div class="overview">{{ overview }}</div>
+			</div>
+		</div>
+	</body>
+</html>	
