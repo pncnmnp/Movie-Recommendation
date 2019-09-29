@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="author" content="parth_parikh">
+		<meta name="description" content="A movie recommender system">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='common_styles.css') }}" />
+		<title>Movie Database</title>
+	</head>
+
+	<body>
+		<h1>Movie Database</h1>
+		<div class="recommendations">
+			{% for title in titles %}
+				<p>
+					<img src="{{ images[title] }}">
+					<br>
+					{{ title }}
+				</p>
+			{% endfor %}
+		</div>
+	</body>
+</html>

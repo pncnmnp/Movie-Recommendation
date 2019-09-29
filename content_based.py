@@ -127,7 +127,7 @@ class ContentBased:
 			raise ValueError("No film : " + title + " found!")
 
 	def recommend(
-		self, title, limit, critics=False, full_search=False, use_pickle=True
+		self, title, limit, critics=False, full_search=False, use_pickle=True, keywords_and_desc=False
 	):
 		"""
             param: title - movie title (as in TMDB dataset)
@@ -143,12 +143,27 @@ class ContentBased:
                    use_pickle - True - will use pickled results
                                 False - will compute the results from scratch
                                 (DEFAULT - True)
+                   keywords_and_desc - True - will merge results of keywords 
+                                              and description
+                                       False - will not merge results of keywords 
+                                               and description
+
+            return: pandas DataFrame object with attributes -
+                    original_title, id, vote_average, vote_count, popularity, release_date
 		"""
 		rec = Recommendation()
 		rec.filter_genres()
 		title_index = self.verify_title(rec.md, title)
 
-		if full_search:
+		if keywords_and_desc:
+			if isfile(PATH_PICKLE_KEYWORDS) and isfile(PATH_PICKLE_DESC) and use_pickle:
+				df_keywords = pd.read_pickle(PATH_PICKLE_KEYWORDS)
+				df_desc = pd.read_pickle(PATH_PICKLE_DESC)
+				rec_matrix_keywords = self.countvectorize(df_keywords)
+				rec_matrix_desc = self.tfidf(df_desc)
+				rec_matrix = rec_matrix_keywords + rec_matrix_desc
+				df = df_keywords
+		elif full_search:
 			if isfile(PATH_PICKLE_KEYWORDS) and use_pickle:
 				df = pd.read_pickle(PATH_PICKLE_KEYWORDS)
 			else:
@@ -183,5 +198,5 @@ class ContentBased:
 if __name__ == "__main__":
 	rec = ContentBased()
 	print(
-		rec.recommend(sys.argv[1], 10, critics=False, full_search=True, use_pickle=True)
+		rec.recommend(sys.argv[1], 10, critics=False, full_search=True, use_pickle=True, keywords_and_desc=False)
 	)
