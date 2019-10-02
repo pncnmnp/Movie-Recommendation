@@ -37,6 +37,8 @@ img {
 	margin: 0 auto;
 	max-width: 100%;
 	padding-bottom: 20px;
+	width: 240px;
+	height: 140px;
 }
 
 #search {
@@ -119,4 +121,9 @@ img {
 
 .recommend-for > span {
 	font-weight: bold;
+}
+
+.recommend-for > span > a {
+	text-decoration: none;
+	color: tomato;
 }

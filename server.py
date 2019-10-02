@@ -43,8 +43,12 @@ def home():
 		did_you_mean = False
 		df = rec.recommend(title, DEFAULT_LIMIT, full_search=True, keywords_and_desc=False, critics=False)
 		poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
-		if rec.changed_title != title:
+		if rec.changed_title != title and rec.changed_title != str():
 			did_you_mean = True
+		else:
+			rec.changed_title = title
+		rec_title_meta = get_meta(rec.changed_title, None)
+		rec_id = rec_title_meta[0]["id"]
 
 		return render_template('recommendations.html', 
 								titles=df["original_title"].tolist(), 
@@ -52,6 +56,7 @@ def home():
 								votes=df["vote_average"].tolist(), 
 								m_id=df["id"].tolist(),
 								rec_title=rec.changed_title,
+								rec_id=rec_id,
 								did_you_mean=did_you_mean)
 	else:
 		return render_template('homepage.html')
