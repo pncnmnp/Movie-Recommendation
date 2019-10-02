@@ -9,13 +9,15 @@ from ast import literal_eval
 app = Flask(__name__, template_folder="./flask/templates/", static_folder="./flask/static/")
 
 DEFAULT_LIMIT = 14
+IMDB_ID_LEN = 7
 
-def get_meta(title):
+def get_meta(title, m_id):
 	rec = Recommendation()
 	rec.filter_genres()
 	rec.filter_productions()
 	df_movies = rec.md
 	df_credits = pd.read_csv(PATH_CREDITS)
+	df_imdb_link = pd.read_csv(PATH_MOVIELENS_TO_TMDB)
 	attributes = ["id", "original_title", "genres", "homepage", 
 					"overview", "release_date", "production_companies", 
 					"runtime", "tagline", "vote_average", "vote_count"]
@@ -25,21 +27,32 @@ def get_meta(title):
 	df_crew = df_credits.iloc[df_credits.index[df_credits["title"] == title][0]][["cast", "crew"]]
 	cast = [cast["name"] for cast in literal_eval(df_crew["cast"])[0:5]]
 	crew = [crew["name"] for crew in literal_eval(df_crew["crew"]) if crew["job"] in ["Director"]]
+	try:
+		imdb_link = str(df_imdb_link.iloc[df_imdb_link.index[df_imdb_link["tmdbId"] == int(m_id)][0]]["imdbId"])[:-2]
+		imdb_link = ("https://www.imdb.com/title/tt" + "0"*(IMDB_ID_LEN - len(imdb_link)) + imdb_link)
+	except:
+		imdb_link = "https://www.imdb.com/search/title/?title=" + title
 
-	return df_title, cast, crew
+	return df_title, cast, crew, imdb_link
 
 @app.route('/', methods=["GET"])
 def home():
 	if "recommend" in request.args:
 		title = request.args["recommend"]
 		rec = ContentBased()
+		did_you_mean = False
 		df = rec.recommend(title, DEFAULT_LIMIT, full_search=True, keywords_and_desc=False, critics=False)
 		poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
+		if rec.changed_title != title:
+			did_you_mean = True
+
 		return render_template('recommendations.html', 
 								titles=df["original_title"].tolist(), 
 								images=poster_paths, 
 								votes=df["vote_average"].tolist(), 
-								m_id=df["id"].tolist())
+								m_id=df["id"].tolist(),
+								rec_title=rec.changed_title,
+								did_you_mean=did_you_mean)
 	else:
 		return render_template('homepage.html')
 
@@ -48,7 +61,7 @@ def movie_meta():
 	if "title" in request.args:
 		title = request.args["title"]
 		m_id = request.args["id"]
-		df_meta = get_meta(title)
+		df_meta = get_meta(title, m_id)
 		poster_path = get_poster_paths([int(m_id)], [title])[title]
 
 		rec = ContentBased()
@@ -71,7 +84,8 @@ def movie_meta():
 								poster_path=poster_path,
 								rec_posters=rec_poster_paths,
 								rec_titles=df_rec["original_title"].tolist(),
-								rec_m_ids=df_rec["id"].tolist())
+								rec_m_ids=df_rec["id"].tolist(),
+								imdb_id=df_meta[3])
 	else:
 		abort(404)
 

@@ -33,7 +33,16 @@ img {
 }
 
 .actors {
+	padding-bottom: 10px;
+}
+
+.imdb_id {
 	padding-bottom: 20px;
+}
+
+a {
+	color: tomato;
+	text-decoration: none;
 }
 
 .overview {

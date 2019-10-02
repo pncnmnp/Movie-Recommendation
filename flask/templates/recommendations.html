@@ -12,6 +12,7 @@
 
 	<body>
 		<img src="{{ url_for('static', filename='images/logo-homepage.png') }}" class="homepage-logo">
+		<div class="recommend-for">Recommendations for <span>{{ rec_title }}</span></div>
 		<div class="recommendations">
 			<div class="row">
 			{% for title in titles %}

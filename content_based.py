@@ -8,6 +8,7 @@ from file_paths import *
 from numpy import argsort
 from ast import literal_eval
 from os.path import isfile
+from difflib import get_close_matches
 import sys
 
 SCAN_SIZE = 30
@@ -19,6 +20,7 @@ CAST_WT = 1
 class ContentBased:
 	def __init__(self):
 		self.md_credits = pd.read_csv(PATH_CREDITS)
+		self.changed_title = str() # used in case Levenstein distance matches a value close to another string
 
 	def make_desc(self, df):
 		"""
@@ -124,7 +126,12 @@ class ContentBased:
 		try:
 			return df.index[df["title"] == title][0]
 		except:
-			raise ValueError("No film : " + title + " found!")
+			try:
+				title = (get_close_matches(title, [movie for movie in df["title"].tolist()])[0])
+				self.changed_title = title
+				return df.index[df["title"] == title][0]
+			except:
+				raise ValueError("No film : " + title + " found!")
 
 	def recommend(
 		self, title, limit, critics=False, full_search=False, use_pickle=True, keywords_and_desc=False
