@@ -8,7 +8,7 @@ from ast import literal_eval
 
 app = Flask(__name__, template_folder="./flask/templates/", static_folder="./flask/static/")
 
-DEFAULT_LIMIT = 14
+DEFAULT_LIMIT = 21
 IMDB_ID_LEN = 7
 
 def get_meta(title, m_id):

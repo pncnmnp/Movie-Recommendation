@@ -127,3 +127,7 @@ img {
 	text-decoration: none;
 	color: tomato;
 }
+
+.recommend-for > span > a:hover {
+	border-bottom: 2px solid black;
+}
