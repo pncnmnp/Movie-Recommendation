@@ -69,33 +69,36 @@ def home():
 @app.route('/movie', methods=["GET"])
 def movie_meta():
 	if "title" in request.args:
-		title = request.args["title"]
-		m_id = request.args["id"]
-		df_meta = get_meta(title, m_id)
-		poster_path = get_poster_paths([int(m_id)], [title])[title]
+		try:
+			title = request.args["title"]
+			m_id = request.args["id"]
+			df_meta = get_meta(title, m_id)
+			poster_path = get_poster_paths([int(m_id)], [title])[title]
 
-		rec = ContentBased()
-		df_rec = rec.recommend(title, 5, full_search=True, keywords_and_desc=False, critics=False)
-		rec_poster_paths = get_poster_paths(df_rec["id"].tolist(), df_rec["original_title"].tolist(), small=True)
+			rec = ContentBased()
+			df_rec = rec.recommend(title, 5, full_search=True, keywords_and_desc=False, critics=False)
+			rec_poster_paths = get_poster_paths(df_rec["id"].tolist(), df_rec["original_title"].tolist(), small=True)
 
-		return render_template('meta.html',
-								title=df_meta[0]["original_title"],
-								genres=df_meta[0]["genres"],
-								homepage=df_meta[0]["homepage"],
-								overview=df_meta[0]["overview"],
-								release=df_meta[0]["release_date"],
-								production=df_meta[0]["production_companies"],
-								runtime=df_meta[0]["runtime"],
-								tagline=df_meta[0]["tagline"],
-								vote_average=df_meta[0]["vote_average"],
-								vote_count=df_meta[0]["vote_count"],
-								cast=df_meta[1],
-								director=df_meta[2],
-								poster_path=poster_path,
-								rec_posters=rec_poster_paths,
-								rec_titles=df_rec["original_title"].tolist(),
-								rec_m_ids=df_rec["id"].tolist(),
-								imdb_id=df_meta[3])
+			return render_template('meta.html',
+									title=df_meta[0]["original_title"],
+									genres=df_meta[0]["genres"],
+									homepage=df_meta[0]["homepage"],
+									overview=df_meta[0]["overview"],
+									release=df_meta[0]["release_date"],
+									production=df_meta[0]["production_companies"],
+									runtime=df_meta[0]["runtime"],
+									tagline=df_meta[0]["tagline"],
+									vote_average=df_meta[0]["vote_average"],
+									vote_count=df_meta[0]["vote_count"],
+									cast=df_meta[1],
+									director=df_meta[2],
+									poster_path=poster_path,
+									rec_posters=rec_poster_paths,
+									rec_titles=df_rec["original_title"].tolist(),
+									rec_m_ids=df_rec["id"].tolist(),
+									imdb_id=df_meta[3])
+		except:
+			abort(404)
 	else:
 		abort(404)
 
