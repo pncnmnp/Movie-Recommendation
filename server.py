@@ -5,6 +5,8 @@ from content_based import ContentBased
 from file_paths import *
 from recommendation import Recommendation
 from ast import literal_eval
+from json import load
+from random import randint
 
 app = Flask(__name__, template_folder="./flask/templates/", static_folder="./flask/static/")
 
@@ -38,26 +40,29 @@ def get_meta(title, m_id):
 @app.route('/', methods=["GET"])
 def home():
 	if "recommend" in request.args:
-		title = request.args["recommend"]
-		rec = ContentBased()
-		did_you_mean = False
-		df = rec.recommend(title, DEFAULT_LIMIT, full_search=True, keywords_and_desc=False, critics=False)
-		poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
-		if rec.changed_title != title and rec.changed_title != str():
-			did_you_mean = True
-		else:
-			rec.changed_title = title
-		rec_title_meta = get_meta(rec.changed_title, None)
-		rec_id = rec_title_meta[0]["id"]
+		try:
+			title = request.args["recommend"]
+			rec = ContentBased()
+			did_you_mean = False
+			df = rec.recommend(title, DEFAULT_LIMIT, full_search=True, keywords_and_desc=False, critics=False)
+			poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
+			if rec.changed_title != title and rec.changed_title != str():
+				did_you_mean = True
+			else:
+				rec.changed_title = title
+			rec_title_meta = get_meta(rec.changed_title, None)
+			rec_id = rec_title_meta[0]["id"]
 
-		return render_template('recommendations.html', 
-								titles=df["original_title"].tolist(), 
-								images=poster_paths, 
-								votes=df["vote_average"].tolist(), 
-								m_id=df["id"].tolist(),
-								rec_title=rec.changed_title,
-								rec_id=rec_id,
-								did_you_mean=did_you_mean)
+			return render_template('recommendations.html', 
+									titles=df["original_title"].tolist(), 
+									images=poster_paths, 
+									votes=df["vote_average"].tolist(), 
+									m_id=df["id"].tolist(),
+									rec_title=rec.changed_title,
+									rec_id=rec_id,
+									did_you_mean=did_you_mean)
+		except:
+			abort(404)
 	else:
 		return render_template('homepage.html')
 
@@ -93,6 +98,13 @@ def movie_meta():
 								imdb_id=df_meta[3])
 	else:
 		abort(404)
+
+@app.errorhandler(404)
+def page_not_found(error):
+	exception = 'Error 404: The page does not exist!'
+	quotes = load(open(PATH_MOVIE_QUOTES))
+	quote = quotes[randint(0, len(quotes))]
+	return render_template('error.html', exception=exception, quote=quote["quote"], quote_movie=quote["movie"]), 404
 
 @app.after_request
 def apply_caching(response):

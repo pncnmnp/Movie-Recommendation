@@ -1,9 +1,8 @@
 import pandas as pd
 from file_paths import *
 
-POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
-POSTER_BASE_URL_SMALL = "https://image.tmdb.org/t/p/w92"
-
+POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500"
+POSTER_BASE_URL_SMALL = "https://image.tmdb.org/t/p/w185"
 def get_poster_paths(movie_ids, movie_titles, small=False):
 	df = pd.read_csv(PATH_POSTERS)
 	paths = dict()

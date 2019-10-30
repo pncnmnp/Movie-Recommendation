@@ -8,6 +8,7 @@ PATH_MOVIELENS_TO_TMDB = "./movies_meta/movielens_to_tmdb.csv"
 PATH_POSTERS = "./movies_meta/posters.csv"
 PATH_PICKLE_KEYWORDS = "./movies_meta/keywords.pkl"
 PATH_PICKLE_DESC = "./movies_meta/desc.pkl"
+PATH_MOVIE_QUOTES = "./movies_meta/movie_quotes.json"
 
 # errors
 CATEGORY_ERROR = "Category not found! Here are the genres: "
