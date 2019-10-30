@@ -41,6 +41,21 @@ img {
 	height: 140px;
 }
 
+.error-page {
+	margin: auto;
+	position: relative;
+	text-align: center;
+	top: 30%;
+}
+
+.error-quote {
+	font-style: italic;
+}
+
+.error-quote-movie {
+	font-weight: bold;
+}
+
 #search {
 	border-radius: 25px;
 	border: 2px solid #000000;
@@ -130,4 +145,23 @@ img {
 
 .recommend-for > span > a:hover {
 	border-bottom: 2px solid black;
+}
+
+@media (max-width: 1000px) {
+	.posters {
+		width: 100px;
+		height: 138px;
+	}
+
+	.overlay-text {
+		font-size: 12px;
+	}
+
+	#search {
+		margin: 5px;
+	}
+
+	.search-button {
+		margin: 10px;
+	}	
 }

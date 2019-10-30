@@ -58,3 +58,13 @@ a:hover {
 	padding-top: 20px;
 	padding-bottom: 20px;
 }
+
+@media (max-width: 1000px) {
+	a:hover {
+		border-bottom: none;
+	}
+	.posters {
+		margin: 2px;
+		border-radius: 10px;
+	}
+}
