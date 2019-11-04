@@ -63,6 +63,23 @@ def home():
 									did_you_mean=did_you_mean)
 		except:
 			abort(404)
+	elif "genres" in request.args:
+		genre = request.args["genres"]
+		if genre == "All":
+			genre = None
+		gen_rec = Recommendation()
+		gen_rec.filter_genres()
+		df = gen_rec.top_movies(gen_rec.md, percentile=0.85, limit=DEFAULT_LIMIT, offset=0, genre=genre)
+		poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
+
+		return render_template('recommendations.html',
+								titles=df["original_title"].tolist(),
+								images=poster_paths,
+								votes=df["vote_average"].tolist(),
+								m_id=df["id"].tolist(),
+								rec_title=request.args["genres"],
+								rec_id=None,
+								did_you_mean=None)
 	else:
 		return render_template('homepage.html')
 

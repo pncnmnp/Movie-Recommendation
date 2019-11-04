@@ -81,11 +81,40 @@ img {
 
 .search-label {
 	font-size: 14px;
-}
-
-.search-label {
 	font-weight: bold;
 	padding-top: 20px;
+}
+
+.top-search-label, .go-homepage {
+	font-size: 14px;
+	font-weight: bold;
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
+
+.top-search-label > a {
+	text-decoration: none;
+	color: black;
+	border-bottom: 3px solid black;
+}
+
+.top-search-label > a:hover {
+	border: 3px solid black;
+}
+
+.go-homepage {
+	text-align: center;
+}
+
+.go-homepage > a {
+	font-size: 32px;
+	text-decoration: none;
+	color: black;
+	border-bottom: 3px solid black;	
+}
+
+.go-homepage > a:hover {
+	border: 3px solid black;
 }
 
 .homepage {
@@ -147,6 +176,33 @@ img {
 	border-bottom: 2px solid black;
 }
 
+.top-search-options {
+	padding-top: 15px;
+	display: none;
+}
+
+.top-search-options select {
+	background-color: white;
+	color: black;
+	padding: 5px;
+	width: 150px;
+	border: 3px solid black;
+	font-size: 14px;
+	-webkit-appearance: button;
+	appearance: button;
+	outline: none;
+}
+
+select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: transparent;
+	background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+	background-repeat: no-repeat;
+	background-position-x: 100%;
+	background-position-y: 3px;
+}
+
 @media (max-width: 1000px) {
 	.posters {
 		width: 100px;
@@ -162,6 +218,6 @@ img {
 	}
 
 	.search-button {
-		margin: 10px;
+		margin: 5px;
 	}	
 }

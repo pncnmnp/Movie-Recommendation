@@ -8,6 +8,27 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='common_styles.css') }}" />
 		<title>Movie Database</title>
+		<script type="text/javascript">
+			window.onload = function() {
+				var genres_list = document.getElementById("top-movies-list");
+				var genres_list_undo = document.getElementById("top-movies-list-undo");
+
+				genres_list.onclick = function() {
+					document.getElementsByClassName('search-movie-homepage')[0].style.display = 'none';
+					document.getElementsByClassName('top-search-label')[0].style.display = 'none';
+					document.getElementsByClassName('top-search-options')[0].style.display = 'inline';
+					return false;
+				}
+
+				genres_list_undo.onclick = function() {
+					document.getElementsByClassName('search-movie-homepage')[0].style.display = 'block';
+					document.getElementsByClassName('top-search-label')[0].style.display = 'block';
+					document.getElementsByClassName('top-search-options')[0].style.display = 'none';
+					return false;
+				}
+
+			}
+		</script>
 	</head>
 
 	<body>
@@ -23,6 +44,43 @@
 					<button class="search-button">Recommend</button>				
 				</form>
 			</div>
-		</div>	
+
+			<div class="top-search-label">
+				<a id="top-movies-list" href="/">Top Rated Movies</a>
+			</div>
+
+			<div class="top-search-options">
+				<div class="top-search-label">Search for Top Rated Movies!</div>
+				<form action="" method="get">
+					<select name="genres">
+						<option value="All">All</option>
+						<option value="Action">Action</option>
+						<option value="Animation">Animation</option>
+						<option value="Fantasy">Fantasy</option>
+						<option value="Science Fiction">Science Fiction</option>
+						<option value="Crime">Crime</option>
+						<option value="Drama">Drama</option>
+						<option value="Thriller">Thriller</option>
+						<option value="Animation">Animation</option>
+						<option value="Family">Family</option>
+						<option value="Western">Western</option>
+						<option value="Comedy">Comedy</option>
+						<option value="Romance">Romance</option>
+						<option value="Horror">Horror</option>
+						<option value="Mystery">Mystery</option>
+						<option value="History">History</option>
+						<option value="War">War</option>
+						<option value="Music">Music</option>
+						<option value="Documentary">Documentary</option>
+						<option value="Foreign">Foreign</option>
+						<option value="TV Movie">TV Movie</option>
+					</select>
+					<button type="submit" class="search-button">Recommend</button>
+				</form>
+				<div class="top-search-label">
+					<a id="top-movies-list-undo" href="/">Homepage</a>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
