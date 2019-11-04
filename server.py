@@ -67,9 +67,11 @@ def home():
 		genre = request.args["genres"]
 		if genre == "All":
 			genre = None
+		offset = int(request.args["offset"])
+
 		gen_rec = Recommendation()
 		gen_rec.filter_genres()
-		df = gen_rec.top_movies(gen_rec.md, percentile=0.85, limit=DEFAULT_LIMIT, offset=0, genre=genre)
+		df = gen_rec.top_movies(gen_rec.md, percentile=0.85, limit=DEFAULT_LIMIT, offset=offset, genre=genre)
 		poster_paths = get_poster_paths(df["id"].tolist(), df["original_title"].tolist())
 
 		return render_template('recommendations.html',
@@ -78,6 +80,9 @@ def home():
 								votes=df["vote_average"].tolist(),
 								m_id=df["id"].tolist(),
 								rec_title=request.args["genres"],
+								offset=offset,
+								next_offset=offset+DEFAULT_LIMIT,
+								prev_offset=offset-DEFAULT_LIMIT,
 								rec_id=None,
 								did_you_mean=None)
 	else:

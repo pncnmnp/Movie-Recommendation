@@ -12,7 +12,11 @@
 
 	<body>
 		<img src="{{ url_for('static', filename='images/logo-homepage.png') }}" class="homepage-logo">
-		<div class="recommend-for">Recommendations for <span><a href="/movie?title={{ rec_title }}&id={{ rec_id }}">{{ rec_title }}</span></div>
+		{% if rec_id is not none %}
+		<div class="recommend-for">Recommendations for <span><a href="/movie?title={{ rec_title }}&id={{ rec_id }}">{{ rec_title }}</a></span></div>
+		{% else %}
+		<div class="recommend-for">Recommendations for <span>{{ rec_title }}</span></div>
+		{% endif %}
 		<div class="recommendations">
 			<div class="row">
 			{% for title in titles %}
@@ -31,6 +35,16 @@
 			{% endfor %}
 			</div>
 		</div>
+		{% if rec_id is none %}
+		<div class="page-nos">
+			{% if offset > 0 %}
+				<a href="/?genres={{ rec_title }}&offset={{ prev_offset }}">Previous</a> | 
+			{% endif %}
+				<a href="/?genres={{ rec_title }}&offset={{ next_offset }}">Next</a>
+		</div>
+		{% else %}
+			NONE
+		{% endif %}
 		<div class="go-homepage">
 			<a id="top-movies-list" href="/">Homepage</a>
 		</div>

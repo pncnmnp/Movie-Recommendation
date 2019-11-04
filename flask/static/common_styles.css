@@ -85,14 +85,14 @@ img {
 	padding-top: 20px;
 }
 
-.top-search-label, .go-homepage {
+.top-search-label, .go-homepage, .page-nos {
 	font-size: 14px;
 	font-weight: bold;
 	padding-top: 10px;
 	padding-bottom: 5px;
 }
 
-.top-search-label > a {
+.top-search-label > a, .page-nos > a {
 	text-decoration: none;
 	color: black;
 	border-bottom: 3px solid black;
@@ -102,7 +102,7 @@ img {
 	border: 3px solid black;
 }
 
-.go-homepage {
+.go-homepage, .page-nos {
 	text-align: center;
 }
 
@@ -113,7 +113,7 @@ img {
 	border-bottom: 3px solid black;	
 }
 
-.go-homepage > a:hover {
+.go-homepage > a:hover, .page-nos > a:hover {
 	border: 3px solid black;
 }
 
