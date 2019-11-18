@@ -3,6 +3,8 @@ import pandas as pd
 from file_paths import *
 from content_based import ContentBased
 from numpy import array
+from os.path import isfile
+import joblib
 
 DEFAULT_ID = 700
 RATING_ATTR = ["userId", "movieId", "rating"]
@@ -107,9 +109,13 @@ class CollaborativeFiltering:
 		sim_options = {"name": "pearson_baseline", "user_based": False}
 
 		data = Dataset.load_from_df(df[RATING_ATTR], reader)
-		model = KNNBaseline(sim_options=sim_options)
-		trainset = data.build_full_trainset()
-		model.fit(trainset)
+		if isfile(PATH_COLL_FILTERING_CACHE):
+			model = joblib.load(PATH_COLL_FILTERING_CACHE)
+		else:
+			trainset = data.build_full_trainset()
+			model = KNNBaseline(sim_options=sim_options)
+			model.fit(trainset)
+			joblib.dump(model, PATH_COLL_FILTERING_CACHE)
 
 		inn_id = model.trainset.to_inner_iid(user_m_ids[0])
 		# print(self.get_movie_title(self.get_tmdb_id(user_m_ids[0])))
@@ -199,10 +205,7 @@ if __name__ == "__main__":
 	print(
 		rec.user_model(
 			{
-				"Raiders of the Lost Ark": 5,
-				"The Avengers": 4,
-				"Iron Man": 4.5,
-				"Thor": 4,
+				"Apollo 13": 5
 			}
 		)
 	)
